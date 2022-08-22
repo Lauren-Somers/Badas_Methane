@@ -1,5 +1,5 @@
 # Badas_Methane
-Mathematical model (in Matlab) that simulates methane and carbon dioxide dynamics in a tropical peatland drainage canal. These codes are shared as part of the submission process of an academic journal article. Accompanying field data for these codes is available from Hydroshare: 
+Mathematical model (in Matlab) that simulates methane and carbon dioxide dynamics in a tropical peatland drainage canal. These codes are shared as part of the submission process of an academic journal article. Accompanying field data for these codes is available from Hydroshare: https://www.hydroshare.org/resource/3953b24e0238467980a226c72cfc360e/![image](https://user-images.githubusercontent.com/25670782/185951389-1cd57b28-ca48-4a7f-91d5-79bf5b4fb84e.png)
 
 The inital commit contains two main matlab scripts and a number of supporting functions:
 
