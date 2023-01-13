@@ -4,10 +4,10 @@ Mathematical model (in Matlab) that simulates methane and carbon dioxide dynamic
 The inital commit contains two main matlab scripts and a number of supporting functions:
 
 <b> Along_canal_nlimmultifit_DOM_scaled_Jan_Aug.m </b> 
-This file fits the mathematical model of methane and carbon dioxide concentrations and stable carbon isotopes for field data.
+This file fits the mathematical model of methane and carbon dioxide concentrations and stable carbon isotopes to field data.
 
 <b> Error_Bands_Budget_Jan_Aug_new.m </b>  
-This script take the best fit simulation and runs a monte-carlo error propagation routine and then makes budget plots that are in the manuscript. 
+This script takes the best fit simulation and runs a monte-carlo error propagation routine and then makes budget plots that are in the manuscript. 
 
 Supporting functions:
 
