@@ -1,6 +1,6 @@
 %% Error_Bands_Budget_Jan_Aug
 % Lauren Somers
-% Mar 11, 2021
+% Jan 13, 2023 - Updated for manuscript revision 1
 %
 % This code takes the fitted parameters and thestandard deviations of
 % parameters and performs a monte carlo simulation to calculate error bands
@@ -14,14 +14,14 @@
 
 n = 1000 + 2; % number of runs in the monte carlo simulation
 
-% params should be the best  fit parameters from the 8 parameter fit (where D and k_DOC are allowed to be different in Jan and Aug):
-p = (mvnrnd(params,Sigma, n))./scaling;
+% params should be the best fit parameters from the 8 parameter fit (where D and k_DOC are allowed to be different in Jan and Aug):
+p = (mvnrnd(params,Sigma, n))./scaling; %Scale parameters
 
 % Now make the first line the best fit scenario:
 p(1,:) = params_US;
 
-% And make the last line the best fit scenario (so it will be easy to plot
-% stuff later)
+% And make the last line the best fit scenario (so it will be easy to make
+% plots at bottom of script)
 p(1002,:) = params_US;
 
 % Values of x at which to solve the ODEs:
@@ -47,7 +47,7 @@ M_del_pred_Aug = zeros (n,length(solve_at));
 budget_C_Aug = zeros (n,5);
 budget_M_Aug = zeros (n,4);
 
-%% THE LOOP: run the model using the inputs p
+%% THE LOOP: run the model using the 1000 sets of Monte Carlo inputs (p)
 
 for i=1:n
 
@@ -261,7 +261,7 @@ budget_M_Aug (i,:) = [advection_M_t     oxidation_M_t   degassing_M_t   fluvial_
 
 end
 
-%% Calculate the confidence bands on the concentrations lines 2:end are the randoms
+%% Calculate the confidence bands on the concentrations. Lines 2:end are the randoms
 
 %JAN
 C_Conc_pred_low_Jan  = prctile(C_Conc_pred_Jan(2:end,:),2.5);
@@ -300,11 +300,11 @@ M_del_mean_Aug = M_del_pred_Aug(1,:);
 %% Load the observed data 
 
 % January 2020
-Canal_data_Jan = xlsread ('/Users/laurensomers/Documents/Research/Badas Methane/Stable Carbon Isotope Analysis/13C-DIC_CH4-Jan_2020.xlsx',7);
+Canal_data_Jan = xlsread ('Field_data/13C-DIC_CH4-Jan_2020.xlsx',7);
 
 % August 2020
-Canal_data_Aug = xlsread ('/Users/laurensomers/Documents/Research/Badas Methane/Stable Carbon Isotope Analysis/13C-DIC_CH4_Badas_Aug_2020.xlsx',1);
-Canal_data_deep_Aug = xlsread ('/Users/laurensomers/Documents/Research/Badas Methane/Stable Carbon Isotope Analysis/13C-DIC_CH4_Badas_Aug_2020.xlsx',2);
+Canal_data_Aug = xlsread ('Field_data/13C-DIC_CH4_Badas_Aug_2020.xlsx',1);
+Canal_data_deep_Aug = xlsread ('Field_data/13C-DIC_CH4_Badas_Aug_2020.xlsx',2);
 x_obs_Aug = Canal_data_Aug(:,1);
 
 %% Calculate the upstream and downstrem bounds (June 2022)
@@ -679,7 +679,7 @@ Source_sink_M = {'CH4 advection';'CH4 oxidation';'CH4 degassing';'CH4 fluvial ex
 budget_table_C_Aug = table(budget_C_mean_Aug',budget_C_low_Aug',budget_C_high_Aug','RowNames',Source_sink_C,'VariableNames',Var_names)
 budget_table_M_Aug = table(budget_M_mean_Aug',budget_M_low_Aug',budget_M_high_Aug','RowNames',Source_sink_M,'VariableNames',Var_names)
 
-%% Plot Budget bar charts with error bars
+%% Plot gas budget bar charts with error bars
 
 figure
 subplot(1,2,2)            
