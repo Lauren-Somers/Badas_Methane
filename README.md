@@ -15,7 +15,7 @@ Supporting functions:
 This is a function called by the above codes that fits the depth of groundwater contribution to the canal based on field data.
 
 <b> "del and Conc" functions </b>
-These eight function contain our mathematical models for concentration and delta 13 C.
+These eight functions contain our mathematical models for concentration and delta 13 C.
 
 <b> nlinmultifit.m </b>
 This is the fitting function used for this project, written by matlab contributor, Chen Avinadav which I can no longer find online. 
