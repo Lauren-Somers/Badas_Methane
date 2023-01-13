@@ -18,4 +18,4 @@ This is a function called by the above codes that fits the depth of groundwater 
 These eight functions contain our mathematical models for concentration and delta 13 C.
 
 <b> nlinmultifit.m </b>
-This is the fitting function used for this project, written by matlab contributor, Chen Avinadav which I can no longer find online. 
+This is the fitting function used for this project, written by matlab contributor, Chen Avinadav which I can no longer find online. It is a wrapper for nlinfit which alows non-linear regression to multiple datasets.
