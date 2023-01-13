@@ -1,6 +1,6 @@
 %% Along_Canal_13C_nlinfit_DOM_Scaled_Jan_Aug
 % Lauren Somers
-% Mar 9, 2021
+% Jan 13, 2023 - updated with manuscript revision 1
 % This code fits a 1D model (in the form of differential equations solved numerically)
 % of canal dissolved gas processes (advection, degassing, DOC oxidation, CH4 oxidation) to field observations of concentration and isotopic 
 % ratios of of CO2 and CH4 along the Badas Canal. This code fits the model
@@ -20,18 +20,18 @@ del_to_ConcC12 = @(delta, Conc_t) (Conc_t)./((delta/1000 +1) * 0.01118 + 1);
 p = [-1.5; 0.97; 2.8; 5.56806e-07 ; 1.4772245e-07; 1.55 ; -1.5; 5.3]';
 
 %% Parameter Scaling:
+% Scaling improves numerical convergence
 %scaling = [10  1  1/10  10000000  10000000  1  10];
 scaling = [1  1  1/10  10000000  10000000  1  1  1];
 p=p.*scaling;
 
 %% ***  Constants that are different in Jan and Aug ***
 
-qgw = [0.0000489  0.0000572]; %(incoming groundwater per unit length of canal (m^2/s)
 qgw = [0.0000489  0.0000611]; %(incoming groundwater per unit length of canal (m^2/s)
 
 % Load porewater concentrations
-PT1_30W_Jan = xlsread('/Users/laurensomers/Documents/Research/Badas Methane/Stable Carbon Isotope Analysis/13C-DIC_CH4-Jan_2020.xlsx',1);
-PT1_30W_Aug = xlsread('/Users/laurensomers/Documents/Research/Badas Methane/Stable Carbon Isotope Analysis/13C-DIC_CH4_Badas_Aug_2020',3);
+PT1_30W_Jan = xlsread('Field_data/13C-DIC_CH4-Jan_2020.xlsx',1);
+PT1_30W_Aug = xlsread('Field_data/13C-DIC_CH4_Badas_Aug_2020',3);
 
 % Fix issues with JAN field data
 PT1_30W_Jan(9:10,:) = []; % Remove duplicate values at d=3m
@@ -72,7 +72,7 @@ PT1_30W_Aug = cat(1, [0   0.0176   -11   2.68*10^(-6)    -47] ,PT1_30W_Aug);   %
 % deep_gw(3,2) = del_to_ConcC12(-70.09,0.4); % 12C-CH4 
 % deep_gw(4,2) = 0.4 - deep_gw(3,2); %13C-CH4
 
-w = 10; % Width of the canal (m)
+w = 10; % Average width of the canal (m)
 
 % DOC isotopic characteristics
 C_DOC = 0.283; % Concentration of CO2 produced by degradation of DOC (mM) 
@@ -91,16 +91,17 @@ C_12atm = del_to_ConcC12 (delta_C_atm,C_atm);
 C_13atm = C_atm - C_12atm;
 
 
-%% Load field observations:
+%% Load field observations from the canal:
 
-Canal_data = xlsread ('/Users/laurensomers/Documents/Research/Badas Methane/Stable Carbon Isotope Analysis/13C-DIC_CH4-Jan_2020.xlsx',7);
+Canal_data = xlsread ('Field_data/13C-DIC_CH4-Jan_2020.xlsx',7);
 Canal_data_Jan = Canal_data(2:(end-1),:); % Cut off the first and last points for fitting 
 x_obs_Jan = Canal_data_Jan(:,1);
 
-Canal_data = xlsread ('/Users/laurensomers/Documents/Research/Badas Methane/Stable Carbon Isotope Analysis/13C-DIC_CH4_Badas_Aug_2020.xlsx',1);
+Canal_data = xlsread ('Field_data/13C-DIC_CH4_Badas_Aug_2020.xlsx',1);
 Canal_data_Aug = Canal_data (1:(end-1),:); % Cut off the last point for fitting
 x_obs_Aug = Canal_data_Aug(:,1);
 
+% Define target data
 % Optimize for conc and delta instead of concentrations of isotopologs
 Conc_obs_d_Jan = Canal_data_Jan(:, 2:5); % Observed concentraitons in conc and delta
 Conc_obs_d_Aug = Canal_data_Aug(:, 3:6); % Observed concentraitons in conc and delta
@@ -122,7 +123,6 @@ Conc_obs_d_Aug_sc (:,4) = (Conc_obs_d_Aug (:,4) - min(Conc_obs_d_Aug(:,4)))/(max
 
 % Save the inputs so that the model function can load them
 %save ('Along_canal_inputs.mat','qgw','w','M_12atm','M_13atm','C_12atm','C_13atm','shallow_gw','deep_gw','Conc_obs_d_Jan_sc','Conc_obs_d_Aug_sc','C_12DOC','C_13DOC','scaling') % The observations are used for re-scaling in the function
-
 save ('Along_canal_inputs.mat','qgw','w','M_12atm','M_13atm','C_12atm','C_13atm','PT1_30W_Jan','PT1_30W_Aug','Conc_obs_d_Jan','Conc_obs_d_Aug','C_12DOC','C_13DOC','scaling'); % The observations are used for re-scaling in the function
 
 %% Optimize the fitting parameters to match field data:
@@ -135,7 +135,7 @@ mdl_cell = {@Conc_CO2_Model_DOM_Jan,  @del_CO2_Model_DOM_Jan,  @Conc_CH4_Model_D
 % Put observations in cell array:        
 Conc_obs_d_cell = {Conc_obs_d_Jan_sc(:,1)' , Conc_obs_d_Jan_sc(:,2)' , Conc_obs_d_Jan_sc(:,3)' , Conc_obs_d_Jan_sc(:,4)',...
                    Conc_obs_d_Aug_sc(:,1)' , Conc_obs_d_Aug_sc(:,2)' , Conc_obs_d_Aug_sc(:,3)' , Conc_obs_d_Aug_sc(:,4)'};
-
+% Put x values in cell array:
 x_obs_cell = {x_obs_Jan',x_obs_Jan',x_obs_Jan',x_obs_Jan',...
               x_obs_Aug',x_obs_Aug',x_obs_Aug',x_obs_Aug'};
 
@@ -155,6 +155,8 @@ C_Conc_pred_Jan = C_Conc_pred_sc_Jan .* (max(Conc_obs_d_Jan(:,1)) - min(Conc_obs
 C_CI_high_Jan = (C_Conc_pred_sc_Jan + C_CI_sc) .* (max(Conc_obs_d_Jan(:,1)) - min(Conc_obs_d_Jan(:,1))) + min(Conc_obs_d_Jan(:,1));
 C_CI_low_Jan = (C_Conc_pred_sc_Jan - C_CI_sc) .* (max(Conc_obs_d_Jan(:,1)) - min(Conc_obs_d_Jan(:,1))) + min(Conc_obs_d_Jan(:,1));
 
+% Note the confidence intervals are different than those produced by the
+% Monte Carlo script
 figure
 subplot (4,2,1)
 plot (Canal_data_Jan (:,1),Canal_data_Jan (:,2),'bo');
@@ -283,15 +285,16 @@ hold on
 plot(x_obs_Aug , Md_CI_low_Aug,':r');
 
 
-%% Error metrics
+%% Error metrics and Fitted Parameters
 
 % Convert covariance matrix to correlation matrix
 Correlation = corrcov(Sigma); % Does the covariance matrix need to be unscaled somehow?
 
-% % Calc residuals
+% % Calculate residuals
 residuals_abs_Jan = Conc_obs_d_Jan - [C_Conc_pred_Jan' , C_del_pred_Jan', M_Conc_pred_Jan' , M_del_pred_Jan'];
 residuals_abs_Aug = Conc_obs_d_Aug - [C_Conc_pred_Aug' , C_del_pred_Aug', M_Conc_pred_Aug' , M_del_pred_Aug'];
- 
+
+%Unscale the fitting parameters:
 params_US = params./scaling %Unscale the parameters
 ci_US (1,:) = ci(:,1)./scaling' %Unscale the 95 % confidence interval
 ci_US (2,:) = ci(:,2)./scaling' %Unscale the 95 % confidence interval
